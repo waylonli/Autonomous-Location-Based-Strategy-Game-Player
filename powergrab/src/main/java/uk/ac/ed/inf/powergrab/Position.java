@@ -4,6 +4,7 @@ public class Position {
     public double latitude;
     public double longitude;
 
+
     public Position(double latitude, double longitude) {
         // update the coordinate of the drone
         this.latitude = latitude;
