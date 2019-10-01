@@ -22,12 +22,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <dependency>
-    <groupId>com.mapbox.mapboxsdk</groupId>
-    <!-- Replace `DESIRED_JAVA_SDK_PACKAGE` with the name of one of the packages listed in the next section-->
-    <artifactId>DESIRED_JAVA_SDK_PACKAGE</artifactId>
-    <version>4.8.0</version>
-  </dependency>
 </project>
-
