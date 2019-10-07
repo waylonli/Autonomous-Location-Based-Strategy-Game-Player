@@ -6,9 +6,9 @@ package uk.ac.ed.inf.powergrab;
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
-
-        System.out.println( Math.cos(Math.PI / 2));
+    public static void main( String[] args ) {
+        String mapString = "http://homepages.inf.ed.ac.uk/stg/powergrab/2019/01/01/powergrabmap.geojson";
+        GeoMap map = new GeoMap(mapString);
+        String mapSource = map.buildMapSource();
     }
 }
