@@ -11,6 +11,7 @@ public class Position {
         this.longitude = longitude;
     }
 
+
     public Position nextPosition(Direction direction) {
 
         // define new latitude and longitude to save the latest coordinate
@@ -18,7 +19,7 @@ public class Position {
         double longitude_new = this.longitude;
 
         // define how the coordinates change after moving
-        switch (direction){
+        switch (direction) {
             case N: {
                 latitude_new += 0.0003;
                 break;
@@ -102,10 +103,10 @@ public class Position {
         return new Position(latitude_new, longitude_new);
     }
 
+
     // compare latitude and longitude with the boundaries to see if the drone is still in play area
     public boolean inPlayArea() {
         if (this.latitude >= 55.946233 || this.latitude <= 55.942617) return false;
-        if (this.longitude <= -3.192473 || this.longitude >= -3.184319) return false;
-        return true;
+        return !(this.longitude <= -3.192473) && !(this.longitude >= -3.184319);
     }
 }
