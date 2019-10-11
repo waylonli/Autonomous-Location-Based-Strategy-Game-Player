@@ -12,5 +12,6 @@
 		<level name="Maven: com.google.code.gson:gson:2.8.5" value="project"/>
 		<level name="Maven: junit:junit:4.9" value="project"/>
 		<level name="Maven: org.hamcrest:hamcrest-core:1.1" value="project"/>
+		<level name="Maven: commons-lang:commons-lang:2.6" value="project"/>
 	</levels>
 </component>
