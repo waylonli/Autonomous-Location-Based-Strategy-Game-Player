@@ -1,15 +1,9 @@
 package uk.ac.ed.inf.powergrab;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
-import org.apache.commons.lang.StringEscapeUtils;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -50,77 +44,15 @@ public class App {
         if (sc.hasNextInt()) {
             int randomSeed = sc.nextInt();
             StatelessDrone stateless = new StatelessDrone(initialLatitude, initialLongitude, randomSeed, year, month, day);
-//            for (int k = 0; k <2; k++){
 
-            // Properties
-            JsonObject properties = new JsonObject();
-            JsonArray coordinates = new JsonArray();
-            JsonArray inicoordinate = new JsonArray();
-
-
-            try{
-                properties.addProperty("prop0", "value0");
-                properties.addProperty("prop1", "\"this\":\"that\"");
-                inicoordinate.add(initialLongitude);
-                inicoordinate.add(initialLatitude);
-                coordinates.add(inicoordinate);
-            }
-            catch (Exception e){
-                System.out.println("Properties JSon writing error!");
-            }
-
-            while (!stateless.checkEnd()){
-                try{
-                    // Coordinates
-                    JsonArray newcoordinate = new JsonArray();
-                    stateless.nextStep(stations);
-                    
-                    newcoordinate.add(stateless.getPosition().longitude);
-                    newcoordinate.add(stateless.getPosition().latitude);
-                    coordinates.add(newcoordinate);
-
-                }
-                catch (Exception e){
-                    System.out.println("Position JSon writing error!");
-                }
-
-            }
-            try{
-                // Geometry
-                JsonObject geometry = new JsonObject();
-                geometry.addProperty("type", "LineString");
-                geometry.add("coordinates", coordinates);
-
-                // JsonList
-                JsonObject list = new JsonObject();
-                list.addProperty("type", "Feature");
-                list.add("geometry", geometry);
-                list.add("properties", properties);
-
-                String path = new String( StringEscapeUtils.unescapeJava(list.toString()).replaceFirst("\"\"","{\""));
-                jsonList = jsonList.substring(0, jsonList.length()-2) + "," +
-                        StringEscapeUtils.unescapeJava(path).replaceFirst("\"\"","\"}");
-            }
-            catch (Exception e){
-                System.out.println("Other JSon error!");
-            }
-            writeJson(jsonList + "]}", year, month, day);
+            JsonWriter statelessWriter = new JsonWriter();
+            statelessWriter.writeStateless(stateless, stations, initialLatitude, initialLongitude, jsonList, year, month, day);
         }
-
+        else{
+            StatefulDrone stateful = new StatefulDrone(initialLatitude, initialLongitude, year, month, day);
+        }
+        
     }
 
-    public static void writeJson(String json, String year, String month, String day){
-        String filename = "/Users/waylon/Desktop/ILP Output/stateless-" + day + "-" + month + "-" + year + ".geojson";
-        BufferedWriter out = null;
-        try{
-            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename, false)));
-            out.write(json);
-            out.flush();
-            out.close();
-        }
-        catch (Exception e){
-            System.out.println("Output GeoJson error!");
-        }
-    }
 
 }

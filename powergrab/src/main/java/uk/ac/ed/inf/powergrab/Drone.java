@@ -22,14 +22,11 @@ public interface Drone {
     // Function to update amount of power
     void setPower(double newPower);
 
-    int getStepCount();
 
     // Play next step
     void nextStep(ArrayList<Station> stations);
 
-    // Check if there is a charging stations nearby
-    Station checkNearby(Position position, ArrayList<Station> stations);
-
+    // Check if the game goes to end
     boolean checkEnd();
 
 }

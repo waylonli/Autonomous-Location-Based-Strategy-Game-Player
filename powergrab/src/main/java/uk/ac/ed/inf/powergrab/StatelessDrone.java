@@ -1,4 +1,5 @@
 package uk.ac.ed.inf.powergrab;
+
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -14,8 +15,8 @@ public class StatelessDrone implements Drone {
     private String year;
     private String month;
     private String day;
-    private int positivenum = 0;
     private Random rand = new Random();
+
     // Initialise the drone, set the initial position, coins and power
     public StatelessDrone(double initialLatitude, double initialLongitude, int randomSeed, String year, String month, String day) {
         setPosition(new Position(initialLatitude, initialLongitude));
@@ -29,62 +30,44 @@ public class StatelessDrone implements Drone {
         this.day = day;
     }
 
-    // Function use to copy a stateless drone
-    public StatelessDrone(StatelessDrone formalDrone) {
-        setPosition(formalDrone.position);
-        setCoins(formalDrone.getCoins());
-        setPower(formalDrone.getPower());
-        this.randomSeed = formalDrone.getRandomSeed();
-        this.rand.setSeed(this.randomSeed);
-        this.stepCount = 0;
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public StatelessDrone() {
+        setCoins(0.0);
+        setPower(250.0);
+        setStepCount(0);
     }
 
-    // Function to set position
-    public void setPosition(Position newPosition) {
-        this.position = newPosition;
-    }
-    // Function to get current position
+
+    // Function to get and set current position
     public Position getPosition() {
         return this.position;
     }
-
-    // Function to set number of coins
-    public void setCoins(double newCoins) {
-        this.coins = newCoins;
+    public void setPosition(Position newPosition) {
+        this.position = newPosition;
     }
-    // Function to get the current number of coins
+
+    // Functions to get and set the current number of coins
     public double getCoins() {
         return this.coins;
     }
-
-    // Function to set amount of power
-    public void setPower(double newPower) {
-        this.power = newPower;
+    public void setCoins(double newCoins) {
+        this.coins = newCoins;
     }
+
     // Function to get the current amount of power
-    public double getPower() {
-        return this.power;
-    }
+    public double getPower() { return this.power; }
+    public void setPower(double newPower) { this.power = newPower; }
 
-    public void setStepCount(int stepCount) {
-        this.stepCount = stepCount;
-    }
-    public int getStepCount() {
-        return this.stepCount;
-    }
+    // Functions to get and set step count
+    public int getStepCount() { return this.stepCount; }
+    public void setStepCount(int stepCount) { this.stepCount = stepCount; }
 
-    public void setRandomSeed(int randomSeed) {
-        this.randomSeed = randomSeed;
-    }
-    public int getRandomSeed() {
-        return this.randomSeed;
-    }
+    // Functions to get and set random seed
+    public int getRandomSeed() { return this.randomSeed; }
+    public void setRandomSeed(int randomSeed) { this.randomSeed = randomSeed; }
+
 
     // Check if there are some stations nearby, get the nearest one
-    public Station checkNearby(Position position, ArrayList<Station> stations) {
+    protected Station checkNearby(Position position, ArrayList<Station> stations) {
         Station nearestSta = null;
         double shortestdis = -1.0;
         // Find the nearest station
@@ -98,49 +81,53 @@ public class StatelessDrone implements Drone {
         return nearestSta;
     }
 
+
+    // Play the nextStep, updating the coins and power and output the step information to txt document
     public void nextStep(ArrayList<Station> stations) {
-        Direction nextDirection = decidePosition(stations);
+        Direction nextDirection = decideDirection(stations);
         Position prePos = getPosition();
 
         this.stepCount += 1;
         setPower(getPower() - 1.25);
         setPosition(this.position.nextPosition(nextDirection));
-        
 
+        // Output the txt document
         String filename = "/Users/waylon/Desktop/ILP Output/stateless-" + day + "-" + month + "-" + year + ".txt";
         BufferedWriter out = null;
-        try{
+        try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename, true)));
             out.write(prePos.latitude + "," + prePos.longitude + ","
-            + nextDirection + ","
-            + getPosition().latitude + "," + getPosition().longitude + ","
-            + getCoins() + "," + getPower() + "\n");
+                    + nextDirection + ","
+                    + getPosition().latitude + "," + getPosition().longitude + ","
+                    + getCoins() + "," + getPower() + "\n");
             out.flush();
             out.close();
-        }
-        catch (Exception a){
+        } catch (Exception a) {
             System.out.println("Output error!");
         }
 
     }
 
 
+    // Check if the game goes to the end
     public boolean checkEnd() {
-        if (stepCount >= 250 || getPower() <= 0.0) return true;
-        return false;
+        return stepCount >= 250 || getPower() <= 0.0;
     }
 
 
     // Function to calculate the distance between two positions
-    private double distance(Position position1, Position position2) {
+    protected double distance(Position position1, Position position2) {
         return Math.sqrt(Math.pow(position1.latitude - position2.latitude, 2) + Math.pow(position1.longitude - position2.longitude, 2));
     }
 
 
-    private Direction decidePosition(ArrayList<Station> stations) {
+    // Choose one direction from the 16 directions to go depending on taking a glance of the next step
+    private Direction decideDirection(ArrayList<Station> stations) {
         Direction positiveDirection = null;
+        Direction minNegtiveDirection = null;
         ArrayList<Direction> neutralDirections = new ArrayList<Direction>();
         Station maxPositiveSta = null;
+        Station minNegativeSta = null;
 
         for (Direction d : Direction.values()) {
             Position nextPos = this.position.nextPosition(d);
@@ -148,6 +135,7 @@ public class StatelessDrone implements Drone {
 
             // Check if it is still in playarea
             if (!nextPos.inPlayArea()) continue;
+
             // See if the nearest station contain positive coins and power
             if (nearestSta == null || nearestSta.getExplored()) neutralDirections.add(d);
             else if (nearestSta.getPositive()) {
@@ -156,23 +144,36 @@ public class StatelessDrone implements Drone {
                     positiveDirection = d;
                     maxPositiveSta = nearestSta;
                 } else if (nearestSta.getPower() > maxPositiveSta.getPower()) {
-                        positiveDirection = d;
-                        maxPositiveSta = nearestSta;
-                    }
+                    positiveDirection = d;
+                    maxPositiveSta = nearestSta;
+                }
+            } else if (!nearestSta.getPositive() && nearestSta.getPower() < 0) {
+                if (minNegativeSta == null) {
+                    minNegtiveDirection = d;
+                    minNegativeSta = nearestSta;
+                } else if (nearestSta.getPower() > minNegativeSta.getPower()) {
+                    minNegtiveDirection = d;
+                    minNegativeSta = nearestSta;
+                }
             }
         }
 
         // Generate a random number from randomSeed to decide a direction
         if (positiveDirection == null) {
-            int randomNum = rand.nextInt((neutralDirections.size()));
-            return neutralDirections.get(randomNum);
+            if (neutralDirections.size() > 0) {
+                int randomNum = rand.nextInt((neutralDirections.size()));
+                return neutralDirections.get(randomNum);
+            } else {
+                setCoins(getCoins() + minNegativeSta.getCoins());
+                setPower(getPower() + minNegativeSta.getPower());
+                checkEnd();
+                minNegativeSta.setCoins(0.0);
+                minNegativeSta.setPower(0.0);
+                minNegativeSta.setExplored(true);
+                return minNegtiveDirection;
+            }
         }
         // If we have a direction which can reach to a positive station, then choose this direction
-        if (!maxPositiveSta.getPositive()) System.out.println("Touch negative station!");
-        else {
-            this.positivenum ++;
-            System.out.println("Touch positive station " + this.positivenum + "!");
-        }
         setCoins(getCoins() + maxPositiveSta.getCoins());
         setPower(getPower() + maxPositiveSta.getPower());
         if (maxPositiveSta != null) {
