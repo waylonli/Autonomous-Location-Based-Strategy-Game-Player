@@ -1,14 +1,25 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.util.HashMap;
+
 public class Position {
-    public double latitude;
-    public double longitude;
+    private double latitude;
+    private double longitude;
+    private HashMap<Direction, Double[]>;
 
 
     public Position(double latitude, double longitude) {
         // update the coordinate of the drone
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return this.latitude;
+    }
+
+    public double getLongitude() {
+        return this.longitude;
     }
 
 
@@ -97,7 +108,6 @@ public class Position {
                 latitude_new += (0.0003 * Math.cos(Math.toRadians(22.5)));
                 longitude_new -= (0.0003 * Math.sin(Math.toRadians(22.5)));
             }
-
         }
 
         return new Position(latitude_new, longitude_new);
@@ -106,7 +116,9 @@ public class Position {
 
     // compare latitude and longitude with the boundaries to see if the drone is still in play area
     public boolean inPlayArea() {
-        if (this.latitude >= 55.946233 || this.latitude <= 55.942617) return false;
-        return !(this.longitude <= -3.192473) && !(this.longitude >= -3.184319);
+        return (!(this.longitude <= -3.192473)) &
+                (!(this.longitude >= -3.184319)) &
+                (!(this.latitude >= 55.946233)) &
+                (!(this.latitude <= 55.942617));
     }
 }
