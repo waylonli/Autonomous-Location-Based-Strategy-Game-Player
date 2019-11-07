@@ -104,9 +104,9 @@ public class StatefulDrone extends StatelessDrone {
     }
 
 
-    private Direction decideNextDirection() {
-        
-    }
+//    private Direction decideNextDirection() {
+//
+//    }
 
 
     private boolean approxEq(double d0, double d1) {

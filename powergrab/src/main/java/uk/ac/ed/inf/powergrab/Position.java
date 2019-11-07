@@ -1,11 +1,8 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.HashMap;
-
 public class Position {
-    private double latitude;
-    private double longitude;
-    private HashMap<Direction, Double[]>;
+    public double latitude;
+    public double longitude;
 
 
     public Position(double latitude, double longitude) {
