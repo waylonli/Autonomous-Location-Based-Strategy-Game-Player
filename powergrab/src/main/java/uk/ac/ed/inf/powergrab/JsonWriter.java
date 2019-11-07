@@ -67,6 +67,7 @@ public class JsonWriter {
             System.out.println("Other JSon error!");
         }
 
+        // Define the ouput path and filename
         String filename = "/Users/waylon/Desktop/ILP Output/stateless-" + day + "-" + month + "-" + year + ".geojson";
         BufferedWriter out = null;
         try{

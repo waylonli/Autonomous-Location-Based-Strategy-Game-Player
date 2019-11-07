@@ -21,6 +21,7 @@ public class App {
         double initialLatitude = sc.nextDouble();
         double initialLongitude = sc.nextDouble();
 
+        // Format the URL link to download the map
         String mapString =
             "http://homepages.inf.ed.ac.uk/stg/powergrab/" + year + "/" + month + "/" + day
                 + "/powergrabmap.geojson";
