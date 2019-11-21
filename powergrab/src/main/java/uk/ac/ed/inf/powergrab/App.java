@@ -17,7 +17,9 @@ public class App {
         String day = sc.next();
         String month = sc.next();
         String year = sc.next();
+        
 
+        
         double initialLatitude = sc.nextDouble();
         double initialLongitude = sc.nextDouble();
 
@@ -27,6 +29,7 @@ public class App {
                 + "/powergrabmap.geojson";
         GeoMap map = new GeoMap(mapString);
         String mapSource = map.buildMapSource();
+
         ArrayList<Station> stations = new ArrayList<Station>();
         ArrayList<Point> passPoints = new ArrayList<Point>();
         FeatureCollection fc = map.readFeature(mapSource);

@@ -3,6 +3,7 @@ package uk.ac.ed.inf.powergrab;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 public class StatefulDrone extends StatelessDrone {
 
@@ -15,6 +16,8 @@ public class StatefulDrone extends StatelessDrone {
     private String month;
     private String day;
     private Station nextStation = null;
+    private static final HashMap<Double, Direction> radians = PosCalculator.getGradians();
+
 
     // Initilaze the stateful drone
     public StatefulDrone(double initialLatitude, double initialLongitude, String year, String month, String day) {
@@ -56,7 +59,7 @@ public class StatefulDrone extends StatelessDrone {
         if (this.nextStation == null)
             this.nextStation = decideNextStation(stations);
 
-
+        Direction nextDirection = decideNextDirection(stations);
 
     }
 
@@ -104,9 +107,32 @@ public class StatefulDrone extends StatelessDrone {
     }
 
 
-//    private Direction decideNextDirection() {
-//
-//    }
+    private Direction decideNextDirection(ArrayList<Station> stations) {
+        Station nextSta = this.nextStation;
+        Position currentPOS = this.getPosition();
+        Position nextPos = nextSta.getPosition();
+        double[] vector = new double[2];
+        vector[0] = nextPos.latitude - currentPOS.latitude;
+        vector[1] = nextPos.longitude - currentPOS.longitude;
+        double angle = Math.atan(vector[0]/vector[1]);
+
+        // Create a list contains all the radians of possible directions
+        ArrayList<Double> radian = new ArrayList<Double>();
+//        for (int i = 0; i <= Math.toRadians(360); i += Math.toRadians(22.5)){
+//            if ((i - angle < 0) &)
+//        }
+
+        int directionNum = 0;
+        for (int i = 0; i < radian.size() - 1; i++){
+            if((radian.get(i) < 0) & (radian.get(i + 1) >= 0)){
+                if (Math.abs(radian.get(i)) > Math.abs(radian.get(i + 1)))
+                    directionNum = i+1;
+                else directionNum = i;
+            }
+        }
+
+        return Direction.N;
+    }
 
 
     private boolean approxEq(double d0, double d1) {
