@@ -166,10 +166,14 @@ public class StatelessDrone implements Drone {
             } else {
                 setCoins(getCoins() + minNegativeSta.getCoins());
                 setPower(getPower() + minNegativeSta.getPower());
-                checkEnd();
-                minNegativeSta.setCoins(0.0);
-                minNegativeSta.setPower(0.0);
-                minNegativeSta.setExplored(true);
+
+                minNegativeSta.setCoins(nearestSta.getCoins() - (nearestSta.getCoins() - getCoins()));
+                minNegativeSta.setPower(nearestSta.getPower() - (nearestSta.getPower() - getPower()));
+                // Check if the amount of coins and power reach to 0
+                if (getCoins() < 0) setCoins(0.0);
+                if (getPower() < 0) setPower(0.0);
+                if (approxEq(minNegativeSta.getCoins(),0.0) && approxEq(minNegativeSta.getPower(), 0.0))
+                    minNegativeSta.setExplored(true);
                 return minNegtiveDirection;
             }
         }
@@ -182,6 +186,11 @@ public class StatelessDrone implements Drone {
             maxPositiveSta.setExplored(true);
         }
         return positiveDirection;
+    }
+
+    private boolean approxEq(double d0, double d1) {
+        final double epsilon = 1.0E-12d;
+        return Math.abs(d0 - d1) < epsilon;
     }
 
 }

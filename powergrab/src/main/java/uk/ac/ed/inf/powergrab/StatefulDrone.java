@@ -56,10 +56,12 @@ public class StatefulDrone extends StatelessDrone {
 
     @Override
     public void nextStep(ArrayList<Station> stations) {
+        // TODO write TXT file and use JsonWriter to record each coordinate
         if (this.nextStation == null)
             this.nextStation = decideNextStation(stations);
 
         Direction nextDirection = decideNextDirection(stations);
+        finishStep(nextDirection, stations);
 
     }
 
@@ -107,31 +109,56 @@ public class StatefulDrone extends StatelessDrone {
     }
 
 
+    // Check if there are some stations nearby, get the nearest one
+    protected Station checkNearby(Position position, ArrayList<Station> stations) {
+        Station nearestSta = null;
+        double shortestdis = -1.0;
+        // Find the nearest station
+        for (int i = 0; i < stations.size(); i++) {
+            Position staPos = stations.get(i).getPosition();
+            double dis = distance(position, staPos);
+            if (dis < 0.00025)
+                if ((shortestdis < 0.0 || dis < shortestdis) && (!stations.get(i).getExplored()))
+                    nearestSta = stations.get(i);
+        }
+        return nearestSta;
+    }
+
     private Direction decideNextDirection(ArrayList<Station> stations) {
         Station nextSta = this.nextStation;
         Position currentPOS = this.getPosition();
-        Position nextPos = nextSta.getPosition();
+        Position nextStaPos = nextSta.getPosition();
         double[] vector = new double[2];
-        vector[0] = nextPos.latitude - currentPOS.latitude;
-        vector[1] = nextPos.longitude - currentPOS.longitude;
+        vector[0] = nextStaPos.latitude - currentPOS.latitude;
+        vector[1] = nextStaPos.longitude - currentPOS.longitude;
         double angle = Math.atan(vector[0]/vector[1]);
 
-        // Create a list contains all the radians of possible directions
-        ArrayList<Double> radian = new ArrayList<Double>();
-//        for (int i = 0; i <= Math.toRadians(360); i += Math.toRadians(22.5)){
-//            if ((i - angle < 0) &)
-//        }
-
-        int directionNum = 0;
-        for (int i = 0; i < radian.size() - 1; i++){
-            if((radian.get(i) < 0) & (radian.get(i + 1) >= 0)){
-                if (Math.abs(radian.get(i)) > Math.abs(radian.get(i + 1)))
-                    directionNum = i+1;
-                else directionNum = i;
+        // Find the direction to go towards our target station
+        Direction nextDir = null;
+        double nextDirAngle = 0.0;
+        for(double r = 0.0; r < 360.0; r+=22.5){
+            if (angle <= r) {
+                nextDir = radians.get(Math.toRadians(r));
+                nextDirAngle = r;
+                break;
             }
         }
 
-        return Direction.N;
+        // See if this direction has a negative station
+        // i is for avoiding infinite loops
+        int i = 0;
+        Position nextPos = getPosition().nextPosition(nextDir);
+        Station nextNearestSta =checkNearby(nextPos, stations);
+        if ((nextNearestSta == null) | nextNearestSta.getExplored())
+            return nextDir;
+        While((!nextNearestSta.getPositive()) && (i <= 15)){
+            nextDirAngle = (nextDirAngle + 22.5) % 360;
+            nextDir = radians.get(Math.toRadians(nextDirAngle));
+            nextPos = getPosition().nextPosition(nextDir);
+            i++;
+        }
+
+        return nextDir;
     }
 
 
@@ -141,8 +168,30 @@ public class StatefulDrone extends StatelessDrone {
     }
 
 
-    public void finishLink() {
+    public void finishStep(Direction d,  ArrayList<Station> stations) {
         // TODO update the coins and power, set station explored, set nextStation to null
+
+        // Update coordinate
+        setPosition(getPosition().nextPosition(d));
+        Station nearestSta = checkNearby(getPosition(), stations);
+
+        if((nearestSta != null) && (!nearestSta.getExplored())){
+            setCoins(getCoins() + nearestSta.getCoins());
+            setPower(getPower() + nearestSta.getPower());
+
+            // Update the coins and power for the connecting station
+            nearestSta.setCoins(nearestSta.getCoins() - (nearestSta.getCoins() - getCoins()));
+            nearestSta.setPower(nearestSta.getPower() - (nearestSta.getPower() - getPower()));
+
+            if (getCoins() < 0.0) setCoins(0.0);
+            if (getPower() < 0.0) setPower(0.0);
+
+            // If the drone already took all the coins and power, set the station to be explored
+            if (approxEq(nearestSta.getCoins(), 0.0) && approxEq(nearestSta.getPower(), 0.0))
+                nearestSta.setExplored(true);
+
+        }
+
     }
 
 //    public void meetNegative(){

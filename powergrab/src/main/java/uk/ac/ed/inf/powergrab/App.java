@@ -48,7 +48,6 @@ public class App {
         if (sc.hasNextInt()) {
             int randomSeed = sc.nextInt();
             StatelessDrone stateless = new StatelessDrone(initialLatitude, initialLongitude, randomSeed, year, month, day);
-
             JsonWriter statelessWriter = new JsonWriter();
             statelessWriter.writeStateless(stateless, stations, initialLatitude, initialLongitude, jsonList, year, month, day);
         }
