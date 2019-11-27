@@ -92,7 +92,7 @@ public class StatelessDrone implements Drone {
         setPosition(this.position.nextPosition(nextDirection));
 
         // Output the txt document
-        String filename = "/Users/waylon/Desktop/ILP Output/stateless-" + day + "-" + month + "-" + year + ".txt";
+        String filename = "./stateless-" + day + "-" + month + "-" + year + ".txt";
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename, true)));

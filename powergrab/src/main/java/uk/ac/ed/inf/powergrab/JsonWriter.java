@@ -36,8 +36,7 @@ public class JsonWriter {
                 // Coordinates
                 JsonArray newcoordinate = new JsonArray();
                 drone.nextStep(stations);
-                
-                System.out.println(drone.getPosition());
+
                 newcoordinate.add(drone.getPosition().longitude);
                 newcoordinate.add(drone.getPosition().latitude);
                 coordinates.add(newcoordinate);
@@ -69,7 +68,7 @@ public class JsonWriter {
         }
 
         // Define the ouput path and filename
-        String filename = "/Users/waylon/Desktop/ILP Output/stateless-" + day + "-" + month + "-" + year + ".geojson";
+        String filename = "./stateless-" + day + "-" + month + "-" + year + ".geojson";
         BufferedWriter out = null;
         try{
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename, false)));

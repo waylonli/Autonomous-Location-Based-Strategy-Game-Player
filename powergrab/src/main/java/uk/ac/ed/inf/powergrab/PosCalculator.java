@@ -36,10 +36,10 @@ public class PosCalculator {
         Direction[] directions = new Direction[]{Direction.N, Direction.NNE, Direction.NE, Direction.ENE, Direction.E,
                 Direction.ESE, Direction.SE, Direction.SSE, Direction.S, Direction.SSW, Direction.SW, Direction.WSW,
                 Direction.W, Direction.WNW, Direction.NW, Direction.NNW};
-
+        
         int i = 0;
-        for (double r = 0.0; r <= Math.toRadians(360.0); r += Math.toRadians(22.5)){
-            radians.put(r, directions[i]);
+        for (double r = 0.0; r < 360.0; r += 22.5){
+            radians.put(Math.toRadians(r), directions[i]);
             i++;
         }
 

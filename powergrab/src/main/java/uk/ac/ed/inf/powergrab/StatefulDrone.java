@@ -57,30 +57,32 @@ public class StatefulDrone extends StatelessDrone {
     @Override
     public void nextStep(ArrayList<Station> stations) {
         // TODO write TXT file and use JsonWriter to record each coordinate
-//        System.out.println("Reach this step!");
+
         if (this.nextStation == null){
             this.nextStation = decideNextStation(stations);
+            System.out.println(this.nextStation.getCoins());
         }
         
         Direction nextDirection = decideNextDirection(stations);
         finishStep(nextDirection, stations);
     }
 
-
+    // TODO implement if no more positive station
     private Station decideNextStation(ArrayList<Station> stations) {
         ArrayList<Station> unexploredStas = new ArrayList<Station>(stations);
+        unexploredStas.removeIf(Station -> (!Station.getPositive()));
         unexploredStas.removeIf(Station::getExplored);
+        System.out.println(unexploredStas.size());
         return getMaxStation(unexploredStas);
     }
 
     private Station getMaxStation(ArrayList<Station> unexploredStas) {
         // Define a score value to measure which station has the most profit and sort the station
-        // TODO score = powerEarn - powerCost + coinsEarn + AroundPositiveStations * 10
         
-        Station MaxStation = Collections.max(unexploredStas, new Comparator<Station> (){
+        Station MaxStation = Collections.min(unexploredStas, new Comparator<Station> (){
             public int compare (Station sta1, Station sta2) {
-                double score1 = stationScore(sta1, unexploredStas);
-                double score2 = stationScore(sta2, unexploredStas);
+                double score1 = distance(sta1.getPosition(), getPosition());
+                double score2 = distance(sta2.getPosition(), getPosition());
                 if (approxEq(score1, score2)) return 0;
                 else if (score1 > score2) return 1;
                 return -1;
@@ -89,25 +91,6 @@ public class StatefulDrone extends StatelessDrone {
         return MaxStation;
     }
 
-    // Calculate the score value for a station
-    private double stationScore(Station station, ArrayList<Station> stations) {
-        double score = 0.0;
-        int stationsAround = 0;
-        final double AROUND_RADIUS = 0.0012;
-
-        // Find the number of stations in range of 0.0012
-        for (int i = 0; i < stations.size(); i++) {
-            Station s = stations.get(i);
-            if ((super.distance(station.getPosition(), s.getPosition()) < AROUND_RADIUS) && (station != s)) {
-                stationsAround += 1;
-            }
-        }
-
-        // score = powerEarn - powerCost + coinsEarn + AroundPositiveStations * 10
-        score = station.getPower() - (super.distance(getPosition(), station.getPosition())) * (1.25/0.0003) + station.getCoins() +
-                (double) stationsAround * 10 - (super.distance(getPosition(), station.getPosition())) * 10000;
-        return score;
-    }
 
 
     // Check if there are some stations nearby, get the nearest one
@@ -127,48 +110,71 @@ public class StatefulDrone extends StatelessDrone {
     }
 
     private Direction decideNextDirection(ArrayList<Station> stations) {
+
         Station nextSta = this.nextStation;
         Position currentPOS = getPosition();
         Position nextStaPos = nextSta.getPosition();
         double[] vector = new double[2];
         vector[0] = nextStaPos.latitude - currentPOS.latitude;
         vector[1] = nextStaPos.longitude - currentPOS.longitude;
-        System.out.println(nextStaPos.latitude);
-        System.out.println(currentPOS.latitude);
         double angle = Math.atan(vector[0]/vector[1]);
+        if (angle < 0) {
+            angle += Math.toRadians(360);
+        }
+
 
         // Find the direction to go towards our target station
         Direction nextDir = null;
         double nextDirAngle = 0.0;
         double r = 0.0;
-        while (r < 360.0) {
-            if (angle <= r) {
-                nextDir = radians.get(Math.toRadians(r));
-                System.out.println(nextDir);
+        while (r <= 360.0) {
+
+            if (angle <= Math.toRadians(r)) {
+                nextDir = radians.get(Math.toRadians(r%360));
                 nextDirAngle = r;
                 break;
             }
             r += 22.5;
         }
+        
         // See if this direction has a negative station
         // i is for avoiding infinite loops
-        int i = 0;
-        Position nextPos = getPosition().nextPosition(nextDir);
-        Station nextNearestSta = checkNearby(nextPos, stations);
-        
-        if ((nextNearestSta == null) | nextNearestSta.getExplored()) {
-            return nextDir;
-        }
 
-        System.out.println("pass the if");
-        while((!nextNearestSta.getPositive()) && (i <= 15)) {
-            nextDirAngle = (nextDirAngle + 22.5) % 360;
+        Position nextPos = getPosition().nextPosition(nextDir);
+        Station nextNearestSta = null;
+
+
+        // if there is a negative station nearby, we need to change another direction
+        int i = 0;
+        double step = 0.0;
+        Direction nullDir = Direction.N;
+        while(i <= 15) {
+            nextDirAngle = ((nextDirAngle + step) % 360);
             nextDir = radians.get(Math.toRadians(nextDirAngle));
             nextPos = getPosition().nextPosition(nextDir);
+            nextNearestSta = checkNearby(nextPos, stations);
+
+            if (nextPos.inPlayArea()) {
+                if (nextNearestSta == null) {
+                    if (distance(nextPos, this.nextStation.getPosition()) < distance(getPosition().nextPosition(nullDir), this.nextStation.getPosition())) {
+                        nullDir = nextDir;
+                    }
+                }
+                else if (nextNearestSta.getExplored()) {
+                    if (distance(nextPos, this.nextStation.getPosition()) < distance(getPosition().nextPosition(nullDir), this.nextStation.getPosition())) {
+                        nullDir = nextDir;
+                    }
+                }
+                else if (nextNearestSta.getPositive()) {
+                    return nextDir;
+                }
+            }
+
             i++;
+            step = 22.5;
         }
-        System.out.println(nextDir);
-        return nextDir;
+
+        return nullDir;
     }
 
 
@@ -179,13 +185,14 @@ public class StatefulDrone extends StatelessDrone {
 
 
     public void finishStep(Direction d,  ArrayList<Station> stations) {
-        // TODO update the coins and power, set station explored, set nextStation to null
 
         // Update coordinate
         setPosition(getPosition().nextPosition(d));
         Station nearestSta = checkNearby(getPosition(), stations);
 
         if((nearestSta != null) && (!nearestSta.getExplored())) {
+            System.out.println("Get!");
+            System.out.println(nearestSta.getCoins());
             setCoins(getCoins() + nearestSta.getCoins());
             setPower(getPower() + nearestSta.getPower());
 
@@ -193,6 +200,7 @@ public class StatefulDrone extends StatelessDrone {
             nearestSta.setCoins(nearestSta.getCoins() - (nearestSta.getCoins() - getCoins()));
             nearestSta.setPower(nearestSta.getPower() - (nearestSta.getPower() - getPower()));
 
+            nearestSta.setExplored(true);
             if (getCoins() < 0.0) setCoins(0.0);
             if (getPower() < 0.0) setPower(0.0);
 
@@ -200,9 +208,19 @@ public class StatefulDrone extends StatelessDrone {
             if (approxEq(nearestSta.getCoins(), 0.0) && approxEq(nearestSta.getPower(), 0.0)) {
                 nearestSta.setExplored(true);
             }
-
+            this.nextStation = null;
         }
+        this.stepCount += 1;
+    }
 
+    protected double distance(Position position1, Position position2) {
+        return Math.sqrt(Math.pow(position1.latitude - position2.latitude, 2) + Math.pow(position1.longitude - position2.longitude, 2));
+    }
+
+
+    // Check if the game goes to the end
+    public boolean checkEnd() {
+        return stepCount >= 250 || getPower() <= 0.0;
     }
 
 //    public void meetNegative(){
