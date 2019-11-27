@@ -16,7 +16,7 @@ public class StatefulDrone extends StatelessDrone {
     private String month;
     private String day;
     private Station nextStation = null;
-    private static final HashMap<Double, Direction> radians = PosCalculator.getGradians();
+    public static final HashMap<Double, Direction> radians = PosCalculator.getGradians();
 
 
     // Initilaze the stateful drone
@@ -57,12 +57,13 @@ public class StatefulDrone extends StatelessDrone {
     @Override
     public void nextStep(ArrayList<Station> stations) {
         // TODO write TXT file and use JsonWriter to record each coordinate
-        if (this.nextStation == null)
+//        System.out.println("Reach this step!");
+        if (this.nextStation == null){
             this.nextStation = decideNextStation(stations);
-
+        }
+        
         Direction nextDirection = decideNextDirection(stations);
         finishStep(nextDirection, stations);
-
     }
 
 
@@ -75,6 +76,7 @@ public class StatefulDrone extends StatelessDrone {
     private Station getMaxStation(ArrayList<Station> unexploredStas) {
         // Define a score value to measure which station has the most profit and sort the station
         // TODO score = powerEarn - powerCost + coinsEarn + AroundPositiveStations * 10
+        
         Station MaxStation = Collections.max(unexploredStas, new Comparator<Station> (){
             public int compare (Station sta1, Station sta2) {
                 double score1 = stationScore(sta1, unexploredStas);
@@ -84,7 +86,6 @@ public class StatefulDrone extends StatelessDrone {
                 return -1;
             }
         });
-
         return MaxStation;
     }
 
@@ -113,6 +114,7 @@ public class StatefulDrone extends StatelessDrone {
     protected Station checkNearby(Position position, ArrayList<Station> stations) {
         Station nearestSta = null;
         double shortestdis = -1.0;
+
         // Find the nearest station
         for (int i = 0; i < stations.size(); i++) {
             Position staPos = stations.get(i).getPosition();
@@ -126,38 +128,46 @@ public class StatefulDrone extends StatelessDrone {
 
     private Direction decideNextDirection(ArrayList<Station> stations) {
         Station nextSta = this.nextStation;
-        Position currentPOS = this.getPosition();
+        Position currentPOS = getPosition();
         Position nextStaPos = nextSta.getPosition();
         double[] vector = new double[2];
         vector[0] = nextStaPos.latitude - currentPOS.latitude;
         vector[1] = nextStaPos.longitude - currentPOS.longitude;
+        System.out.println(nextStaPos.latitude);
+        System.out.println(currentPOS.latitude);
         double angle = Math.atan(vector[0]/vector[1]);
 
         // Find the direction to go towards our target station
         Direction nextDir = null;
         double nextDirAngle = 0.0;
-        for(double r = 0.0; r < 360.0; r+=22.5){
+        double r = 0.0;
+        while (r < 360.0) {
             if (angle <= r) {
                 nextDir = radians.get(Math.toRadians(r));
+                System.out.println(nextDir);
                 nextDirAngle = r;
                 break;
             }
+            r += 22.5;
         }
-
         // See if this direction has a negative station
         // i is for avoiding infinite loops
         int i = 0;
         Position nextPos = getPosition().nextPosition(nextDir);
-        Station nextNearestSta =checkNearby(nextPos, stations);
-        if ((nextNearestSta == null) | nextNearestSta.getExplored())
+        Station nextNearestSta = checkNearby(nextPos, stations);
+        
+        if ((nextNearestSta == null) | nextNearestSta.getExplored()) {
             return nextDir;
-        While((!nextNearestSta.getPositive()) && (i <= 15)){
+        }
+
+        System.out.println("pass the if");
+        while((!nextNearestSta.getPositive()) && (i <= 15)) {
             nextDirAngle = (nextDirAngle + 22.5) % 360;
             nextDir = radians.get(Math.toRadians(nextDirAngle));
             nextPos = getPosition().nextPosition(nextDir);
             i++;
         }
-
+        System.out.println(nextDir);
         return nextDir;
     }
 
@@ -175,7 +185,7 @@ public class StatefulDrone extends StatelessDrone {
         setPosition(getPosition().nextPosition(d));
         Station nearestSta = checkNearby(getPosition(), stations);
 
-        if((nearestSta != null) && (!nearestSta.getExplored())){
+        if((nearestSta != null) && (!nearestSta.getExplored())) {
             setCoins(getCoins() + nearestSta.getCoins());
             setPower(getPower() + nearestSta.getPower());
 
@@ -187,8 +197,9 @@ public class StatefulDrone extends StatelessDrone {
             if (getPower() < 0.0) setPower(0.0);
 
             // If the drone already took all the coins and power, set the station to be explored
-            if (approxEq(nearestSta.getCoins(), 0.0) && approxEq(nearestSta.getPower(), 0.0))
+            if (approxEq(nearestSta.getCoins(), 0.0) && approxEq(nearestSta.getPower(), 0.0)) {
                 nearestSta.setExplored(true);
+            }
 
         }
 

@@ -18,8 +18,6 @@ public class App {
         String month = sc.next();
         String year = sc.next();
         
-
-        
         double initialLatitude = sc.nextDouble();
         double initialLongitude = sc.nextDouble();
 
@@ -51,8 +49,10 @@ public class App {
             JsonWriter statelessWriter = new JsonWriter();
             statelessWriter.writeStateless(stateless, stations, initialLatitude, initialLongitude, jsonList, year, month, day);
         }
-        else{
+        else if (sc.next().equals("stateful")){
             StatefulDrone stateful = new StatefulDrone(initialLatitude, initialLongitude, year, month, day);
+            JsonWriter statefulWriter = new JsonWriter();
+            statefulWriter.writeStateless(stateful, stations, initialLatitude, initialLongitude, jsonList, year, month,day);
         }
         
     }

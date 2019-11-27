@@ -167,8 +167,9 @@ public class StatelessDrone implements Drone {
                 setCoins(getCoins() + minNegativeSta.getCoins());
                 setPower(getPower() + minNegativeSta.getPower());
 
-                minNegativeSta.setCoins(nearestSta.getCoins() - (nearestSta.getCoins() - getCoins()));
-                minNegativeSta.setPower(nearestSta.getPower() - (nearestSta.getPower() - getPower()));
+                minNegativeSta.setCoins(minNegativeSta.getCoins() - (minNegativeSta.getCoins() - getCoins()));
+                minNegativeSta.setPower(minNegativeSta.getPower() - (minNegativeSta.getPower() - getPower()));
+
                 // Check if the amount of coins and power reach to 0
                 if (getCoins() < 0) setCoins(0.0);
                 if (getPower() < 0) setPower(0.0);

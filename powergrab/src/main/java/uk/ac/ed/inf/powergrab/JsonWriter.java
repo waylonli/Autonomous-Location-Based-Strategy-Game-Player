@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class JsonWriter {
 
-    public static void writeStateless(StatelessDrone stateless, ArrayList<Station> stations,
+    public static void writeStateless(StatelessDrone drone, ArrayList<Station> stations,
                                  double initialLatitude, double initialLongitude,
                                  String jsonList, String year, String month, String day){
 
@@ -31,14 +31,15 @@ public class JsonWriter {
             System.out.println("Properties JSon writing error!");
         }
 
-        while (!stateless.checkEnd()){
+        while (!drone.checkEnd()){
             try{
                 // Coordinates
                 JsonArray newcoordinate = new JsonArray();
-                stateless.nextStep(stations);
-
-                newcoordinate.add(stateless.getPosition().longitude);
-                newcoordinate.add(stateless.getPosition().latitude);
+                drone.nextStep(stations);
+                
+                System.out.println(drone.getPosition());
+                newcoordinate.add(drone.getPosition().longitude);
+                newcoordinate.add(drone.getPosition().latitude);
                 coordinates.add(newcoordinate);
 
             }
