@@ -13,13 +13,12 @@ import java.util.Scanner;
 public class App {
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String day = sc.next();
-        String month = sc.next();
-        String year = sc.next();
-        
-        double initialLatitude = sc.nextDouble();
-        double initialLongitude = sc.nextDouble();
+        String day = args[0];
+        String month = args[1];
+        String year = args[2];
+        double initialLatitude = Double.parseDouble(args[3]);
+        double initialLongitude = Double.parseDouble(args[4]);
+        int randomSeed = Integer.parseInt(args[5]);
 
         // Format the URL link to download the map
         String mapString =
@@ -43,16 +42,15 @@ public class App {
         }
 
         // See whether the user choose to play with stateless drone or stateful drone
-        if (sc.hasNextInt()) {
-            int randomSeed = sc.nextInt();
+        if (args[6].equals("stateless")) {
             StatelessDrone stateless = new StatelessDrone(initialLatitude, initialLongitude, randomSeed, year, month, day);
             JsonWriter statelessWriter = new JsonWriter();
-            statelessWriter.writeStateless(stateless, stations, initialLatitude, initialLongitude, jsonList, year, month, day);
+            statelessWriter.writeJson(stateless, stations, initialLatitude, initialLongitude, jsonList, year, month, day, "stateless");
         }
-        else if (sc.next().equals("stateful")){
+        else {
             StatefulDrone stateful = new StatefulDrone(initialLatitude, initialLongitude, year, month, day);
             JsonWriter statefulWriter = new JsonWriter();
-            statefulWriter.writeStateless(stateful, stations, initialLatitude, initialLongitude, jsonList, year, month,day);
+            statefulWriter.writeJson(stateful, stations, initialLatitude, initialLongitude, jsonList, year, month,day, "stateful");
         }
         
     }

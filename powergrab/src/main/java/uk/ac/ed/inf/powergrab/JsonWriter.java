@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 public class JsonWriter {
 
-    public static void writeStateless(StatelessDrone drone, ArrayList<Station> stations,
+    public static void writeJson(StatelessDrone drone, ArrayList<Station> stations,
                                  double initialLatitude, double initialLongitude,
-                                 String jsonList, String year, String month, String day){
+                                 String jsonList, String year, String month, String day, String type){
 
         JsonObject properties = new JsonObject();
         JsonArray coordinates = new JsonArray();
@@ -68,7 +68,7 @@ public class JsonWriter {
         }
 
         // Define the ouput path and filename
-        String filename = "./stateless-" + day + "-" + month + "-" + year + ".geojson";
+        String filename = "./"+ type + "-" + day + "-" + month + "-" + year + ".geojson";
         BufferedWriter out = null;
         try{
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename, false)));

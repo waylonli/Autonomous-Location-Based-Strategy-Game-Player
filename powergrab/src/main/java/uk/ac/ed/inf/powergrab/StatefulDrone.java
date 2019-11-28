@@ -1,5 +1,9 @@
 package uk.ac.ed.inf.powergrab;
 
+import javax.swing.plaf.synth.SynthSpinnerUI;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,7 +11,6 @@ import java.util.HashMap;
 
 public class StatefulDrone extends StatelessDrone {
 
-    private final double radius = 0.001;
     private Position position = null;
     private double coins;
     private double power;
@@ -16,6 +19,9 @@ public class StatefulDrone extends StatelessDrone {
     private String month;
     private String day;
     private Station nextStation = null;
+    private boolean lastSta = false;
+    private double lastAngle = -10.0;
+    private double preAngle = -10.0;
     public static final HashMap<Double, Direction> radians = PosCalculator.getGradians();
 
 
@@ -28,7 +34,9 @@ public class StatefulDrone extends StatelessDrone {
         this.year = year;
         this.month = month;
         this.day = day;
+        this.lastSta = false;
     }
+
 
     // Function to get and set current position
     public Position getPosition() {
@@ -57,28 +65,48 @@ public class StatefulDrone extends StatelessDrone {
     @Override
     public void nextStep(ArrayList<Station> stations) {
         // TODO write TXT file and use JsonWriter to record each coordinate
+        Position prePos = getPosition();
 
-        if (this.nextStation == null){
+        if (this.lastSta == false){
             this.nextStation = decideNextStation(stations);
-            System.out.println(this.nextStation.getCoins());
         }
         
-        Direction nextDirection = decideNextDirection(stations);
-        finishStep(nextDirection, stations);
+        double nextAngle = decideNextDirection(stations);
+        finishStep(nextAngle, stations);
+
+        String filename = "./stateful-" + day + "-" + month + "-" + year + ".txt";
+        BufferedWriter out = null;
+        try {
+            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename, true)));
+            out.write(prePos.latitude + "," + prePos.longitude + ","
+                    + radians.get(Math.toRadians(nextAngle)) + ","
+                    + getPosition().latitude + "," + getPosition().longitude + ","
+                    + getCoins() + "," + getPower() + "\n");
+            out.flush();
+            out.close();
+        } catch (Exception a) {
+            System.out.println("Output error!");
+        }
     }
+
+
 
     // TODO implement if no more positive station
     private Station decideNextStation(ArrayList<Station> stations) {
         ArrayList<Station> unexploredStas = new ArrayList<Station>(stations);
         unexploredStas.removeIf(Station -> (!Station.getPositive()));
         unexploredStas.removeIf(Station::getExplored);
-        System.out.println(unexploredStas.size());
         return getMaxStation(unexploredStas);
     }
 
+
+
     private Station getMaxStation(ArrayList<Station> unexploredStas) {
         // Define a score value to measure which station has the most profit and sort the station
-        
+        System.out.println(unexploredStas.size());
+        if (unexploredStas.size() == 1) {
+            this.lastSta = true;
+        }
         Station MaxStation = Collections.min(unexploredStas, new Comparator<Station> (){
             public int compare (Station sta1, Station sta2) {
                 double score1 = distance(sta1.getPosition(), getPosition());
@@ -109,72 +137,71 @@ public class StatefulDrone extends StatelessDrone {
         return nearestSta;
     }
 
-    private Direction decideNextDirection(ArrayList<Station> stations) {
+    private double decideNextDirection(ArrayList<Station> stations) {
+
+        if (this.lastAngle >= 0) {
+            this.lastAngle = (this.lastAngle + 180) % 360;
+            return this.lastAngle;
+        }
 
         Station nextSta = this.nextStation;
-        Position currentPOS = getPosition();
-        Position nextStaPos = nextSta.getPosition();
-        double[] vector = new double[2];
-        vector[0] = nextStaPos.latitude - currentPOS.latitude;
-        vector[1] = nextStaPos.longitude - currentPOS.longitude;
-        double angle = Math.atan(vector[0]/vector[1]);
-        if (angle < 0) {
-            angle += Math.toRadians(360);
-        }
-
-
         // Find the direction to go towards our target station
-        Direction nextDir = null;
-        double nextDirAngle = 0.0;
-        double r = 0.0;
-        while (r <= 360.0) {
-
-            if (angle <= Math.toRadians(r)) {
-                nextDir = radians.get(Math.toRadians(r%360));
-                nextDirAngle = r;
-                break;
-            }
-            r += 22.5;
-        }
-        
         // See if this direction has a negative station
         // i is for avoiding infinite loops
-
-        Position nextPos = getPosition().nextPosition(nextDir);
+        Direction nextDir = null;
+        Position nextPos = null;
         Station nextNearestSta = null;
-
+        double nextDirAngle = 0.0;
 
         // if there is a negative station nearby, we need to change another direction
         int i = 0;
         double step = 0.0;
-        Direction nullDir = Direction.N;
+        double nullAngle = -10.0;
+        double shortestDis = 99999.9;
+
         while(i <= 15) {
-            nextDirAngle = ((nextDirAngle + step) % 360);
+            nextDirAngle = nextDirAngle + step;
+            if (nextDirAngle == ((this.preAngle + 180) % 360)){
+                if (step != 0.0) {
+                    i++;
+                    continue;
+                }
+                else {
+                    step = 22.5;
+                    i++;
+                    continue;
+                }
+            }
             nextDir = radians.get(Math.toRadians(nextDirAngle));
             nextPos = getPosition().nextPosition(nextDir);
             nextNearestSta = checkNearby(nextPos, stations);
 
             if (nextPos.inPlayArea()) {
                 if (nextNearestSta == null) {
-                    if (distance(nextPos, this.nextStation.getPosition()) < distance(getPosition().nextPosition(nullDir), this.nextStation.getPosition())) {
-                        nullDir = nextDir;
+                    double disToSta = distance(nextPos, this.nextStation.getPosition());
+                    if (disToSta < shortestDis) {
+                        shortestDis = disToSta;
+                        nullAngle = nextDirAngle;
                     }
                 }
                 else if (nextNearestSta.getExplored()) {
-                    if (distance(nextPos, this.nextStation.getPosition()) < distance(getPosition().nextPosition(nullDir), this.nextStation.getPosition())) {
-                        nullDir = nextDir;
+                    double disToSta = distance(nextPos, this.nextStation.getPosition());
+                    if (disToSta < shortestDis) {
+                        shortestDis = disToSta;
+                        nullAngle = nextDirAngle;
                     }
                 }
                 else if (nextNearestSta.getPositive()) {
-                    return nextDir;
+                    this.preAngle = nextDirAngle;
+                    return nextDirAngle;
                 }
             }
 
             i++;
             step = 22.5;
         }
-
-        return nullDir;
+        this.preAngle = nullAngle;
+        return nullAngle;
     }
 
 
@@ -184,15 +211,18 @@ public class StatefulDrone extends StatelessDrone {
     }
 
 
-    public void finishStep(Direction d,  ArrayList<Station> stations) {
+    public void finishStep(double angle,  ArrayList<Station> stations) {
 
         // Update coordinate
-        setPosition(getPosition().nextPosition(d));
+        setPosition(getPosition().nextPosition(radians.get(Math.toRadians(angle))));
         Station nearestSta = checkNearby(getPosition(), stations);
 
         if((nearestSta != null) && (!nearestSta.getExplored())) {
-            System.out.println("Get!");
-            System.out.println(nearestSta.getCoins());
+            if (nearestSta.getPositive() == false){
+                System.out.println("Negative!!!!");
+            }
+                
+            
             setCoins(getCoins() + nearestSta.getCoins());
             setPower(getPower() + nearestSta.getPower());
 
@@ -209,12 +239,13 @@ public class StatefulDrone extends StatelessDrone {
                 nearestSta.setExplored(true);
             }
             this.nextStation = null;
-        }
-        this.stepCount += 1;
-    }
 
-    protected double distance(Position position1, Position position2) {
-        return Math.sqrt(Math.pow(position1.latitude - position2.latitude, 2) + Math.pow(position1.longitude - position2.longitude, 2));
+            if (this.lastSta == true) {
+                this.lastAngle = angle;
+            }
+        }
+        setPower(getPower() - 1.25);
+        this.stepCount += 1;
     }
 
 
