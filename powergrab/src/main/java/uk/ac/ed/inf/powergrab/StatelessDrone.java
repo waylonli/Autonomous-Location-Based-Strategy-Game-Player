@@ -70,13 +70,16 @@ public class StatelessDrone implements Drone {
     protected Station checkNearby(Position position, ArrayList<Station> stations) {
         Station nearestSta = null;
         double shortestdis = -1.0;
+
         // Find the nearest station
         for (int i = 0; i < stations.size(); i++) {
             Position staPos = stations.get(i).getPosition();
             double dis = distance(position, staPos);
             if (dis < 0.00025)
-                if ((shortestdis < 0.0 || dis < shortestdis) && (!stations.get(i).getExplored()))
+                if ((shortestdis < 0.0) || (dis < shortestdis)) {
                     nearestSta = stations.get(i);
+                    shortestdis = dis;
+                }
         }
         return nearestSta;
     }

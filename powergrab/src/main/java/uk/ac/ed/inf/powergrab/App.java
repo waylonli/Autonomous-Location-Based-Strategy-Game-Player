@@ -40,7 +40,6 @@ public class App {
             Station newSta = new Station(staPos, newfea.getProperty("coins").getAsDouble(), newfea.getProperty("power").getAsDouble());
             stations.add(newSta);
         }
-
         // See whether the user choose to play with stateless drone or stateful drone
         if (args[6].equals("stateless")) {
             StatelessDrone stateless = new StatelessDrone(initialLatitude, initialLongitude, randomSeed, year, month, day);
@@ -48,7 +47,7 @@ public class App {
             statelessWriter.writeJson(stateless, stations, initialLatitude, initialLongitude, jsonList, year, month, day, "stateless");
         }
         else {
-            StatefulDrone stateful = new StatefulDrone(initialLatitude, initialLongitude, year, month, day);
+            StatefulDrone stateful = new StatefulDrone(initialLatitude, initialLongitude, randomSeed, year, month, day);
             JsonWriter statefulWriter = new JsonWriter();
             statefulWriter.writeJson(stateful, stations, initialLatitude, initialLongitude, jsonList, year, month,day, "stateful");
         }
