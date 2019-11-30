@@ -5,7 +5,6 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Hello world!
@@ -28,7 +27,6 @@ public class App {
         String mapSource = map.buildMapSource();
 
         ArrayList<Station> stations = new ArrayList<Station>();
-        ArrayList<Point> passPoints = new ArrayList<Point>();
         FeatureCollection fc = map.readFeature(mapSource);
         String jsonList = fc.toJson();
 

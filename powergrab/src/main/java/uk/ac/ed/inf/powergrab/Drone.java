@@ -2,6 +2,11 @@ package uk.ac.ed.inf.powergrab;
 
 import java.util.ArrayList;
 
+
+/**
+ * Interface class to define some basic functions of drones
+ * @author s1891340
+ */
 public interface Drone {
 
     // Function to get current position

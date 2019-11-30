@@ -2,7 +2,17 @@ package uk.ac.ed.inf.powergrab;
 
 import java.util.HashMap;
 
+
+/**
+ * A calculator class which calculates the
+ * @author s1891340
+ */
 public class PosCalculator {
+
+    /**
+     * Create a hashmap containing the changes of coordinates for every direction
+     * @return the hashmap
+     */
     public static HashMap<Direction, double[]>  getPosChanges() {
         HashMap<Direction, double[]> map = new HashMap<Direction, double[]>();
 
@@ -31,6 +41,11 @@ public class PosCalculator {
         return map;
     }
 
+
+    /**
+     * Create a hashmap containing map from radians to directions
+     * @return
+     */
     public static HashMap<Double, Direction> getGradians() {
         HashMap<Double, Direction> radians = new HashMap<>();
         Direction[] directions = new Direction[]{Direction.N, Direction.NNE, Direction.NE, Direction.ENE, Direction.E,

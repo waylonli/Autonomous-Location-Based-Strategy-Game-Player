@@ -1,12 +1,8 @@
 package uk.ac.ed.inf.powergrab;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
-import javax.swing.plaf.synth.SynthSpinnerUI;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class StatefulDrone extends StatelessDrone {
@@ -237,76 +233,6 @@ public class StatefulDrone extends StatelessDrone {
 
         return nextAng;
 
-
-
-
-
-
-
-
-//        =================================================
-//        Station nextSta = this.nextStation;
-        // Find the direction to go towards our target station
-        // See if this direction has a negative station
-        // i is for avoiding infinite loops
-//        Direction nextDir = null;
-//        Position nextPos = null;
-//        Station nextNearestSta = null;
-//        double nextDirAngle = 0.0;
-//
-//        // if there is a negative station nearby, we need to change another direction
-//        int i = 0;
-//        double step = 0.0;
-//        double nullAngle = -10.0;
-//        double shortestDis = 99999.9;
-//
-//        while(i <= 15) {
-//            nextDirAngle = nextDirAngle + step;
-//            if (nextDirAngle == ((this.preAngle + 180) % 360)){
-//                if (step != 0.0) {
-//                    i++;
-//                    continue;
-//                }
-//                else {
-//                    step = 22.5;
-//                    i++;
-//                    continue;
-//                }
-//            }
-//            nextDir = radians.get(Math.toRadians(nextDirAngle));
-//            nextPos = getPosition().nextPosition(nextDir);
-//            nextNearestSta = checkNearby(nextPos, stations);
-//
-//            if (nextPos.inPlayArea()) {
-//                if (nextNearestSta == null) {
-//                    double disToSta = distance(nextPos, this.nextStation.getPosition());
-//                    if (disToSta < shortestDis) {
-//                        shortestDis = disToSta;
-//                        nullAngle = nextDirAngle;
-//                    }
-//                }
-//                else if (nextNearestSta.getExplored()) {
-//                    double disToSta = distance(nextPos, this.nextStation.getPosition());
-//                    if (disToSta < shortestDis) {
-//                        shortestDis = disToSta;
-//                        nullAngle = nextDirAngle;
-//                    }
-//                }
-//                else if (nextNearestSta.getPositive()) {
-//                    this.preAngle = nextDirAngle;
-//                    return nextDirAngle;
-//                }
-//            }
-//
-//            i++;
-//            step = 22.5;
-//        }
-//        if (nullAngle < 0) {
-//            nullAngle = (this.preAngle + 180) % 360;
-//            return nullAngle;
-//        }
-//        this.preAngle = nullAngle;
-//        return nullAngle;
     }
 
 
