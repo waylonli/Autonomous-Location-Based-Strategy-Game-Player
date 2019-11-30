@@ -5,15 +5,17 @@ import java.util.HashMap;
 
 /**
  * A calculator class which calculates the
+ *
  * @author s1891340
  */
 public class PosCalculator {
 
     /**
      * Create a hashmap containing the changes of coordinates for every direction
+     *
      * @return the hashmap
      */
-    public static HashMap<Direction, double[]>  getPosChanges() {
+    public static HashMap<Direction, double[]> getPosChanges() {
         HashMap<Direction, double[]> map = new HashMap<Direction, double[]>();
 
         // For N, S, E, W
@@ -44,6 +46,7 @@ public class PosCalculator {
 
     /**
      * Create a hashmap containing map from radians to directions
+     *
      * @return
      */
     public static HashMap<Double, Direction> getGradians() {
@@ -51,9 +54,10 @@ public class PosCalculator {
         Direction[] directions = new Direction[]{Direction.N, Direction.NNE, Direction.NE, Direction.ENE, Direction.E,
                 Direction.ESE, Direction.SE, Direction.SSE, Direction.S, Direction.SSW, Direction.SW, Direction.WSW,
                 Direction.W, Direction.WNW, Direction.NW, Direction.NNW};
-        
+
+        // add 16 directions with their radians to the hashmap
         int i = 0;
-        for (double r = 0.0; r < 360.0; r += 22.5){
+        for (double r = 0.0; r < 360.0; r += 22.5) {
             radians.put(Math.toRadians(r), directions[i]);
             i++;
         }

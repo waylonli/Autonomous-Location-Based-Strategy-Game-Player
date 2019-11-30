@@ -12,21 +12,23 @@ import java.util.ArrayList;
 
 /**
  * A class to write GeoJson file
+ *
  * @author s1891340
  */
 public class JsonWriter {
 
     /**
      * A method to run the game and write GeoJson file for stateless drone and stateful drone
-     * @param drone can be stateful or stateless
-     * @param stations the array list contains all the stations in the map
-     * @param initialLatitude latitude of initial position
+     *
+     * @param drone            can be stateful or stateless
+     * @param stations         the array list contains all the stations in the map
+     * @param initialLatitude  latitude of initial position
      * @param initialLongitude longitude of initial position
-     * @param jsonList the GeoJson file containing the information of stations
-     * @param year year of the map
-     * @param month month of the map
-     * @param day day of the map
-     * @param type can be "stateful" or "stateless" which indicates the type of the drone
+     * @param jsonList         the GeoJson file containing the information of stations
+     * @param year             year of the map
+     * @param month            month of the map
+     * @param day              day of the map
+     * @param type             can be "stateful" or "stateless" which indicates the type of the drone
      */
     public static void writeJson(StatelessDrone drone, ArrayList<Station> stations,
                                  double initialLatitude, double initialLongitude,

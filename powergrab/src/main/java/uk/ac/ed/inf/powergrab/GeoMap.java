@@ -1,6 +1,7 @@
 package uk.ac.ed.inf.powergrab;
 
 import com.mapbox.geojson.FeatureCollection;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * A class to handle the task of reading GeoJson files
+ *
  * @author s1891340
  */
 public class GeoMap {
@@ -23,6 +25,7 @@ public class GeoMap {
 
     /**
      * Constructor of GeoMap, requesting connection to the web server
+     *
      * @param mapString the webpage address of the GeoJson file
      */
     public GeoMap(String mapString) {
@@ -43,6 +46,7 @@ public class GeoMap {
 
     /**
      * A method to store the GeoJson file as string
+     *
      * @return the GeoJson file as a string
      */
     public String buildMapSource() {
@@ -64,6 +68,7 @@ public class GeoMap {
 
     /**
      * Read the features from mapSource
+     *
      * @param mapSource GeoJson file as a string
      * @return feature collection contains all the
      */
