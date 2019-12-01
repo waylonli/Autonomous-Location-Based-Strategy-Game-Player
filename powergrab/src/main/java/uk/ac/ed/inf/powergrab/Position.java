@@ -30,14 +30,6 @@ public class Position {
         this.longitude = longitude;
     }
 
-    public double getLatitude() {
-        return this.latitude;
-    }
-
-    public double getLongitude() {
-        return this.longitude;
-    }
-
 
     /**
      * Calculate the next position after moving one step towards a direction
