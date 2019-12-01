@@ -341,7 +341,7 @@ public class StatefulDrone extends StatelessDrone {
      * @param angle the angle of direction to move forward
      * @param stations the list containing all the stations
      */
-    public void finishStep(double angle, ArrayList<Station> stations) {
+    private void finishStep(double angle, ArrayList<Station> stations) {
 
         // Update coordinate and get the nearby station
         setPosition(getPosition().nextPosition(radians.get(Math.toRadians(angle))));

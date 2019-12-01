@@ -6,9 +6,9 @@
         <element id="file-copy" path="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="powergrab" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-lang/commons-lang/2.6/commons-lang-2.6.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/mapbox/mapboxsdk/mapbox-sdk-geojson/4.9.0/mapbox-sdk-geojson-4.9.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$APPLICATION_HOME_DIR$/lib/junit.jar" path-in-jar="/" />
     </root>
   </artifact>
