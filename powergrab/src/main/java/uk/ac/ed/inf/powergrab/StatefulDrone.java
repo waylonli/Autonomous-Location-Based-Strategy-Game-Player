@@ -197,7 +197,6 @@ public class StatefulDrone extends StatelessDrone {
      * @return the station to go
      */
     private Station getStation(ArrayList<Station> unexploredStas, boolean min) {
-
         if (unexploredStas.size() == 1) {
             this.lastSta = true;
         }
@@ -349,26 +348,31 @@ public class StatefulDrone extends StatelessDrone {
 
 
         if ((nearestSta != null) && (!nearestSta.getExplored())) {
-            // give information for debugging if the drone touches a negative station
-            if (nearestSta.getPositive() == false) {
-                System.out.println("Negative!!!!");
-            }
-
-            // reset the step count for reaching a single station when linking to a nearby station
-            this.singleStepCount = -1;
-
             // update the coins and power
             setCoins(getCoins() + nearestSta.getCoins());
             setPower(getPower() + nearestSta.getPower());
 
-            // Update the coins, power and exploration for the connecting station
-            nearestSta.setCoins(nearestSta.getCoins() - (nearestSta.getCoins() - getCoins()));
-            nearestSta.setPower(nearestSta.getPower() - (nearestSta.getPower() - getPower()));
+            // give information for debugging if the drone touches a negative station
+            if (!nearestSta.getPositive()) {
+                System.out.println("Negative!!!!");
 
-            // if all the coins and power are taken away, set it to be explored
-            if (approxEq(nearestSta.getCoins(), 0) && approxEq(nearestSta.getPower(), 0)){
-                nearestSta.setExplored(true);
+                // Update the coins, power and exploration for the connecting station
+                double staCoins = nearestSta.getCoins();
+                double staPow = nearestSta.getPower();
+                if (Math.abs(staCoins) > getCoins()) {
+                    nearestSta.setCoins(staCoins + getCoins());
+                }else nearestSta.setCoins(0);
+
+                if (Math.abs(staPow) > getPower()) {
+                    nearestSta.setPower(staPow + getPower());
+                }else nearestSta.setPower(0);
+            }else {
+                nearestSta.setCoins(0);
+                nearestSta.setPower(0);
             }
+
+            // reset the step count for reaching a single station when linking to a nearby station
+            this.singleStepCount = -1;
 
             // the drone cannot contain negative number of coins and power
             if (getCoins() < 0.0) setCoins(0.0);
@@ -395,7 +399,6 @@ public class StatefulDrone extends StatelessDrone {
         if (this.lastAngle < 0) {
             this.singleStepCount += 1;
         }
-
     }
 
 
